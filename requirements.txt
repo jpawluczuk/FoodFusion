@@ -1,4 +1,5 @@
 flask
+SQLAlchemy>=1.4.18
 
 # YOLOv5 requirements
 gitpython>=3.1.30

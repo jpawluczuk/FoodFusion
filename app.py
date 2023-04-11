@@ -1,12 +1,18 @@
 import io
 import os
 import datetime
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, jsonify
+from flask_sqlalchemy import SQLAlchemy
 from PIL import Image
 
 import torch    # pip install torch torchvision
 
+db = SQLAlchemy()
+
 app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root@localhost/foodfusiondb"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
 
 DATETIME_FORMAT = "%Y-%m-%d_%H-%M-%S-%f"
 
@@ -29,7 +35,7 @@ def predict_test():
             image_file = request.files["file"]
             image_bytes = image_file.read()
             img = Image.open(io.BytesIO(image_bytes))
-            results = model(img, size=640) # reduce size=320 for faster inference
+            results = model(img, size=640) 
 
             ingredients = set()
             for r in results.pandas().xyxy[0].to_dict(orient="records"):
@@ -41,6 +47,17 @@ def predict_test():
             # return results.pandas().xyxy[0].to_json(orient="records")
 
     return render_template("index.html")
+
+@app.route("/test")
+def test():
+    ingredients = Ingredient.query.all()
+    result = [{"ingredientID": ingredient.ingredientID, "ingredientName": ingredient.ingredientName} for ingredient in ingredients]
+    return jsonify(result)
+
+@app.route("/test-two")
+def testtwo():
+    ingredients = Ingredient.query.all()
+    return render_template("test.html", ingredients=ingredients)
 
 #@app.route("/ts", methods=["GET", "POST"])
 #def predict():
@@ -62,3 +79,8 @@ def predict_test():
 #        return redirect(img_savename)
 #
 #    return render_template("index.html")
+
+class Ingredient(db.Model):
+    __tablename__ = "ingredient"
+    ingredientID = db.Column(db.Integer, primary_key=True)
+    ingredientName = db.Column(db.String(120), nullable=False)

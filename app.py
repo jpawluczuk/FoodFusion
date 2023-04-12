@@ -1,10 +1,10 @@
 import io
 import os
 import datetime
-from flask import Flask, render_template, request, redirect, jsonify
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, request, redirect, jsonify, session
+from sqlalchemy import func
 from PIL import Image
-from database import db, Ingredient
+from database import *
 
 import torch    # pip install torch torchvision
 
@@ -57,10 +57,35 @@ def predict_test():
         now_time = datetime.datetime.now().strftime(DATETIME_FORMAT)
         img_savedirectory = f"static/{now_time}.png"
         Image.fromarray(results.ims[0]).save(img_savedirectory)
+        session['ingredients'] = ingredients_dict
 
         return render_template("results.html", ingredients=ingredients_dict, img_name=img_savedirectory)
     
     return render_template("detect.html")
+
+@app.route("/recommend_recipes")
+def recommend_recipes():
+    ingredients_dict = session.get('ingredients')
+    if ingredients_dict:
+        ingredient_names = ingredients_dict.keys()
+
+        query = (
+            db.session.query(Recipe)
+            .join(RecipeIngredient)
+            .join(Ingredient)
+            .filter(Ingredient.ingredientName.in_(ingredient_names))
+            .group_by(Recipe.recipeID)
+            .having(func.count(Ingredient.ingredientID) == len(ingredient_names))
+        )
+
+        recipes = query.all()
+        if len(recipes) > 0:
+            return "It worked!"
+        else:
+            return "No recipes found."
+    else:
+        return "No ingredients provided."
+
 
 #@app.route("/test")
 #def test():

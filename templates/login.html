@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/static/css/stylesheet.css" rel="stylesheet">
+    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>FoodFusion</title>
+</head>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+{% include 'header.html' %}
+<body>
+    <div class="container" style="max-width: 400px;">
+        <form>
+            <div class="illustration d-flex justify-content-center"><img src="/static/images/logo/FoodFusion_Logo_Large.png" style="padding: 1em 0 1em 0; width: 244px;"></div>
+            <div class="form-outline mb-4">
+                <input type="email" id="form2Example1" class="form-control" />
+                <label class="form-label" for="form2Example1">Email address</label>
+            </div>
+        
+            <div class="form-outline mb-4">
+                <input type="password" id="form2Example2" class="form-control" />
+                <label class="form-label" for="form2Example2">Password</label>
+            </div>
+        
+            <!-- Submit button -->
+            <button type="button" class="btn btn-primary btn-block mb-4 mx-auto secondary-button">Sign in</button>
+        
+            <!-- Register buttons -->
+            <div class="text-center">
+            <p>Don't have an account? <a href="#">Register</a></p>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

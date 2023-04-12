@@ -4,10 +4,9 @@ import datetime
 from flask import Flask, render_template, request, redirect, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from PIL import Image
+from database import db, Ingredient
 
 import torch    # pip install torch torchvision
-
-db = SQLAlchemy()
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root@localhost/foodfusiondb"
@@ -22,6 +21,15 @@ model = torch.hub.load('ultralytics/yolov5', 'custom', path="D:\Forth_Year_Colle
 def index():
     return render_template("index.html")
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        return redirect("/")
+
+    return render_template("login.html")
+
 @app.route("/detect", methods=["GET", "POST"])
 def predict_test():
     if request.method == "POST":
@@ -31,33 +39,39 @@ def predict_test():
         if not file:
             return
 
-        if request.files.get("file"):
-            image_file = request.files["file"]
-            image_bytes = image_file.read()
-            img = Image.open(io.BytesIO(image_bytes))
-            results = model(img, size=640) 
+    if request.files.get("file"):
+        image_file = request.files["file"]
+        image_bytes = image_file.read()
+        img = Image.open(io.BytesIO(image_bytes))
+        results = model(img, size=640) 
 
-            ingredients = set()
-            for r in results.pandas().xyxy[0].to_dict(orient="records"):
-                ingredients.add(r["name"])
+        ingredients_dict = {}
+        for r in results.pandas().xyxy[0].to_dict(orient="records"):
+            ingredient_name = r["name"]
+            if ingredient_name in ingredients_dict:
+                ingredients_dict[ingredient_name] += 1
+            else:
+                ingredients_dict[ingredient_name] = 1
 
-            ingredients = sorted(list(ingredients))
+        results.render()  # updates results.imgs with boxes and labels
+        now_time = datetime.datetime.now().strftime(DATETIME_FORMAT)
+        img_savedirectory = f"static/{now_time}.png"
+        Image.fromarray(results.ims[0]).save(img_savedirectory)
 
-            return ingredients
-            # return results.pandas().xyxy[0].to_json(orient="records")
+        return render_template("results.html", ingredients=ingredients_dict, img_name=img_savedirectory)
+    
+    return render_template("detect.html")
 
-    return render_template("index.html")
+#@app.route("/test")
+#def test():
+#    ingredients = Ingredient.query.all()
+#    result = [{"ingredientID": ingredient.ingredientID, "ingredientName": ingredient.ingredientName} for ingredient in ingredients]
+#    return jsonify(result)
 
-@app.route("/test")
-def test():
-    ingredients = Ingredient.query.all()
-    result = [{"ingredientID": ingredient.ingredientID, "ingredientName": ingredient.ingredientName} for ingredient in ingredients]
-    return jsonify(result)
-
-@app.route("/test-two")
-def testtwo():
-    ingredients = Ingredient.query.all()
-    return render_template("test.html", ingredients=ingredients)
+#@app.route("/test-two")
+#def testtwo():
+#    ingredients = Ingredient.query.all()
+#    return render_template("test.html", ingredients=ingredients)
 
 #@app.route("/ts", methods=["GET", "POST"])
 #def predict():
@@ -79,8 +93,3 @@ def testtwo():
 #        return redirect(img_savename)
 #
 #    return render_template("index.html")
-
-class Ingredient(db.Model):
-    __tablename__ = "ingredient"
-    ingredientID = db.Column(db.Integer, primary_key=True)
-    ingredientName = db.Column(db.String(120), nullable=False)

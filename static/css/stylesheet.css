@@ -1,3 +1,10 @@
 body {
     background-color: #FAFAF0 !important; 
+    color: #484845 !important;
+}
+
+.secondary-button {
+    background-color:  #FBC252 !important;
+    color: #484845 !important;
+    border: none !important;
 }

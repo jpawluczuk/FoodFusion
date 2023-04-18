@@ -40,8 +40,8 @@ class Recipe(db.Model):
 
 class RecipeIngredient(db.Model):
     __tablename__ = "recipes_has_ingredients"
-    Recipe_recipeID = db.Column(db.Integer, db.ForeignKey("recipe.recipeID"), primary_key=True, nullable=False)
-    Ingredient_ingredientID = db.Column(db.Integer, db.ForeignKey("ingredient.ingredientID"), primary_key=True, nullable=False)
+    Recipes_recipeID = db.Column(db.Integer, db.ForeignKey("recipe.recipeID"), primary_key=True, nullable=False)
+    Ingredients_ingredientID = db.Column(db.Integer, db.ForeignKey("ingredient.ingredientID"), primary_key=True, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     Units_unitID = db.Column(db.Integer, db.ForeignKey("units.unitID"), nullable=False)
 

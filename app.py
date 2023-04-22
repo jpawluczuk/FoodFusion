@@ -30,9 +30,19 @@ def create_app(test_config=None):
             return redirect("/")
 
         return render_template("login.html")
+    
+    @app.route("/viewRecipe/<int:id>", methods=["GET"])
+    def viewRecipe(id):
+        recipe = Recipe.query.get(id)
+        insrtuctions = Instruction.query.filter_by(Recipes_recipeID=id).all()
+        recipeIngredients = RecipeIngredient.query.filter_by(Recipes_recipeID=id).all()
+        if recipe is None:
+            return redirect("/")
+
+        return render_template("viewRecipe.html", recipe=recipe)
 
     @app.route("/detect", methods=["GET", "POST"])
-    def predict_test():
+    def detect():
         if request.method == "POST":
             if "file" not in request.files:
                 return redirect(request.url)
@@ -56,7 +66,7 @@ def create_app(test_config=None):
                 else:
                     ingredients_dict[ingredient_name] = 1
 
-            results.render()  # updates results.imgs with boxes and labels
+            results.render()
             now_time = datetime.datetime.now().strftime(DATETIME_FORMAT)
             img_savedirectory = f"static/{now_time}.png"
             Image.fromarray(results.ims[0]).save(img_savedirectory)
@@ -91,11 +101,11 @@ def create_app(test_config=None):
                 .having(and_(*[func.count(distinct(RecipeIngredient.Ingredients_ingredientID)) == len(ingredient_ids)]))
             )
 
-            recipesids = query.all()
-            recipesids = [recipeid[0] for recipeid in recipesids]
-            print(recipesids)
-            recipes = db.session.execute(db.select(Recipe).filter(Recipe.recipeID.in_(recipesids))).fetchall()
-            print(recipes)
+            recipesids = query.all() #Returns the recipe ID's as tuples
+            recipesids = [recipeid[0] for recipeid in recipesids] #Takes the first element of each tuple and puts it in a list
+            print(recipesids) # Debugging Line
+            recipes = Recipe.query.filter(Recipe.recipeID.in_(recipesids)).all() # Queries the database and gets all the recipes using the recipes ID's
+            print(recipes) # Debugging Line
 
             if len(recipes) > 0:
                 return render_template("recipePage.html", recipes=recipes)
@@ -103,37 +113,4 @@ def create_app(test_config=None):
                 return "No recipes found."
         else:
             return "No ingredients provided."
-
-
-    #@app.route("/test")
-    #def test():
-    #    ingredients = Ingredient.query.all()
-    #    result = [{"ingredientID": ingredient.ingredientID, "ingredientName": ingredient.ingredientName} for ingredient in ingredients]
-    #    return jsonify(result)
-
-    #@app.route("/test-two")
-    #def testtwo():
-    #    ingredients = Ingredient.query.all()
-    #    return render_template("test.html", ingredients=ingredients)
-
-    #@app.route("/ts", methods=["GET", "POST"])
-    #def predict():
-    #    if request.method == "POST":
-    #        if "file" not in request.files:
-    #            return redirect(request.url)
-    #        file = request.files["file"]
-    #        if not file:
-    #            return
-    #
-    #       img_bytes = file.read()
-    #        img = Image.open(io.BytesIO(img_bytes))
-    #        results = model([img])
-    #
-    #        results.render()  # updates results.imgs with boxes and labels
-    #        now_time = datetime.datetime.now().strftime(DATETIME_FORMAT)
-    #        img_savename = f"static/{now_time}.png"
-    #        Image.fromarray(results.ims[0]).save(img_savename)
-    #        return redirect(img_savename)
-    #
-    #    return render_template("index.html")
     return app

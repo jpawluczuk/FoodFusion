@@ -31,11 +31,21 @@
                 {% endfor %}
               </tbody>
             </table>
-            <button class="btn btn-lg big-button">Large Button</button>
+            
           </div>
           <div class="col-md-6">
             <h2>Detection Image</h2>
-            <img src="{{ img_name }}">
+            <img src="{{ img_name }}" style="width: 400px;">
+          </div>
+        </div>
+        <div class="row d-flex justify-content-center" style="padding-top: 1em;">
+          <div class="col-md-6">
+            <form method="POST" action="/recommend_recipes">
+              <button class="btn btn-lg big-button secondary-button" type="submit" name="my_dict" value="{{ingredients}}">Recommend Recipes</button>
+            </form>
+          </div>
+          <div class="col-md-6">
+            <button class="btn btn-lg big-button secondary-button">Add to Digital Fridge</button>
           </div>
         </div>
       </div>      

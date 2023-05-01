@@ -27,9 +27,28 @@ FoodFusion is a object betection based web application that provides users with 
 9. To view the application after it is running, open a browser and go to the following url:
 ``` http://localhost:5000/```
 
+## Testing
+``` static/images/test_images ``` directory has images for testing purposes. Any other image can also be used.
+
 ## Usage
 The project as of right now has one function and that is to provide a recipe to the user based on the ingredients that they have. 
 
 The user can go to the image upload page via the "Detect" button on the nav bar or the "Detect Ingredients" button on the home page. 
+![image](https://user-images.githubusercontent.com/61418085/235458839-2b147bef-7cb1-4662-bf47-93be04c55de6.png)
 
-Once on the image upload page the user can upload an image of their ingredients and press upload. That will take the user and display 
+
+Once on the image upload page the user can upload an image of their ingredients and press upload.
+![image](https://user-images.githubusercontent.com/61418085/235458905-172effdc-ab59-4bae-a83f-df3f88a4f1f8.png)
+
+That will take the user to a page where they will be shown the image they uploaded with the bounding boxes on the objects detected and a table that contains the image and name of the ingredients detected aswell as the amount of that ingredient.
+![image](https://user-images.githubusercontent.com/61418085/235460378-d0e3ece4-011b-4063-8cf8-6c39030aeafe.png)
+
+From there the user can get recipes recommended to them that will use all the ingredients detected all atleast one ingredient. The following image shows what happens if you presse the "Recommend Recipes" button on that image that can be seen in the image above.
+![image](https://user-images.githubusercontent.com/61418085/235460566-2c56521a-dde7-46fc-b633-db5444da0d16.png)
+The user only gets provided with on recipes that uses all the ingredients in the image. The user still has the option to search for recipes that use atleast one ingredient.
+
+![image](https://user-images.githubusercontent.com/61418085/235460732-874c5810-a818-4317-9904-8dbe2c612162.png)
+It can be seen that in the alternative search there is more recipe available, this can be used to see what the user can make if they abuy another ingredient or two combinded with the ingredients they already have.
+
+
+

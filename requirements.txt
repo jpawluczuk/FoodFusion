@@ -1,5 +1,7 @@
+# Flask requirements
 flask
 SQLAlchemy>=1.4.18
+flask-sqlalchemy>=3.0.3
 
 # YOLOv5 requirements
 gitpython>=3.1.30
@@ -14,7 +16,9 @@ torch>=1.7.0
 torchvision>=0.8.1
 tqdm>=4.64.0
 seaborn>=0.11.0
+setuptools
 pandas
 
 # Extras
 psutil
+mysqlclient>=2.1.1

@@ -14,9 +14,7 @@ def create_app(test_config=None):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.secret_key = "dev"
     db.init_app(app)
-    
-    path_to_model = os.path.join(os.path.dirname(__file__), 'static', 'best.pt')
-    model = torch.hub.load('ultralytics/yolov5', 'custom', path=path_to_model)  # force_reload = recache latest code
+    model = torch.hub.load('ultralytics/yolov5', 'custom', path="D:\Forth_Year_College_Work\FYP\FoodFusion/static/best.pt")  # force_reload = recache latest code
 
     DATETIME_FORMAT = "%Y-%m-%d_%H-%M-%S-%f"
 
@@ -110,19 +108,23 @@ def create_app(test_config=None):
                 .group_by(Recipe.recipeID)
                 .having(and_(*[func.count(distinct(RecipeIngredient.Ingredients_ingredientID)) == len(ingredient_ids)]))
             )
+
             recipesids = query.all() 
             #Returns the recipe ID's as tuples
             recipesids = [recipeid[0] for recipeid in recipesids] #Takes the first element of each tuple and puts it in a list
-            recipes = Recipe.query.filter(Recipe.recipeID.in_(recipesids)).all() # Queries the database and gets all the recipes using the recipes ID's
+
+
+            recipes = []
+            for recipe_id in recipesids:
+                recipe_ingredients = RecipeIngredient.query.filter_by(Recipes_recipeID=recipe_id).all()
+                recipe_ingredient_ids = [ri.Ingredients_ingredientID for ri in recipe_ingredients]
+                if set(recipe_ingredient_ids).issubset(set(ingredient_ids)):
+                    recipes.append(Recipe.query.get(recipe_id))
 
             option = 0
 
-            if len(recipes) > 0:
-                return render_template("recommended_recipes.html", recipes=recipes, option=option)
-            else:
-                return "No recipes found."
-        else:
-            return "No ingredients provided."
+
+            return render_template("recommended_recipes.html", recipes=recipes, option=option)
         
     @app.route("/recommend_recipes_alternative", methods=["GET", "POST"])
     def recommend_recipes_alternative():

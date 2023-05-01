@@ -8,3 +8,7 @@ body {
     color: #484845 !important;
     border: none !important;
 }
+
+.custom-upload-container {
+    max-width: 960px !important;
+}

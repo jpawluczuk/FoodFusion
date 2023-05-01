@@ -15,31 +15,39 @@ def create_app(test_config=None):
     app.secret_key = "dev"
     db.init_app(app)
     model = torch.hub.load('ultralytics/yolov5', 'custom', path="D:\Forth_Year_College_Work\FYP\FoodFusion/static/best.pt")  # force_reload = recache latest code
-    
+
     DATETIME_FORMAT = "%Y-%m-%d_%H-%M-%S-%f"
 
     @app.route("/")
     def index():
         return render_template("index.html")
-
-    @app.route("/login", methods=["GET", "POST"])
-    def login():
-        if request.method == "POST":
-            username = request.form.get("username")
-            password = request.form.get("password")
-            return redirect("/")
-
-        return render_template("login.html")
+    
+    @app.route("/all_recipes", methods=["GET"])
+    def all_recipes():
+        recipes = Recipe.query.all()
+        return render_template("recipes.html", recipes=recipes)
     
     @app.route("/viewRecipe/<int:id>", methods=["GET"])
     def viewRecipe(id):
         recipe = Recipe.query.get(id)
-        insrtuctions = Instruction.query.filter_by(Recipes_recipeID=id).all()
-        recipeIngredients = RecipeIngredient.query.filter_by(Recipes_recipeID=id).all()
+        instructions = Instruction.query.filter_by(Recipes_recipeID=id).order_by(Instruction.step_number.asc()).all()
+
+        recipe_ingredients = (
+            db.session.query(
+                Ingredient.ingredientName,
+                RecipeIngredient.quantity,
+                Units.acronym
+            )
+            .join(RecipeIngredient, Ingredient.ingredientID == RecipeIngredient.Ingredients_ingredientID)
+            .join(Units, RecipeIngredient.Units_unitID == Units.unitID)
+            .filter(RecipeIngredient.Recipes_recipeID == recipe.recipeID)
+            .all()
+        )
+        
         if recipe is None:
             return redirect("/")
 
-        return render_template("viewRecipe.html", recipe=recipe)
+        return render_template("recipePage.html", recipe=recipe, instructions=instructions, recipe_ingredients=recipe_ingredients)
 
     @app.route("/detect", methods=["GET", "POST"])
     def detect():
@@ -100,17 +108,55 @@ def create_app(test_config=None):
                 .group_by(Recipe.recipeID)
                 .having(and_(*[func.count(distinct(RecipeIngredient.Ingredients_ingredientID)) == len(ingredient_ids)]))
             )
-
-            recipesids = query.all() #Returns the recipe ID's as tuples
+            recipesids = query.all() 
+            #Returns the recipe ID's as tuples
             recipesids = [recipeid[0] for recipeid in recipesids] #Takes the first element of each tuple and puts it in a list
-            print(recipesids) # Debugging Line
             recipes = Recipe.query.filter(Recipe.recipeID.in_(recipesids)).all() # Queries the database and gets all the recipes using the recipes ID's
-            print(recipes) # Debugging Line
+
+            option = 0
 
             if len(recipes) > 0:
-                return render_template("recipePage.html", recipes=recipes)
+                return render_template("recommended_recipes.html", recipes=recipes, option=option)
             else:
                 return "No recipes found."
         else:
             return "No ingredients provided."
+        
+    @app.route("/recommend_recipes_alternative", methods=["GET", "POST"])
+    def recommend_recipes_alternative():
+        ingredients_dict = session.get('ingredients')
+        if ingredients_dict:
+            ingredient_names = list(ingredients_dict.keys())
+            ingredient_names = [x for x in ingredient_names if not isinstance(x, int)]
+            print(ingredient_names)
+
+            results = (
+                db.session.query(Ingredient.ingredientID)
+                .filter(Ingredient.ingredientName.in_(ingredient_names))
+                .all()
+            )
+
+            ingredient_ids = [result[0] for result in results]
+            print(ingredient_ids)
+
+            query = (
+                db.session.query(Recipe.recipeID)
+                .join(RecipeIngredient, Recipe.recipeID == RecipeIngredient.Recipes_recipeID)
+                .filter(RecipeIngredient.Ingredients_ingredientID.in_(ingredient_ids))
+                .group_by(Recipe.recipeID)
+                .having(func.count(distinct(RecipeIngredient.Ingredients_ingredientID)) >= 1)
+            )
+
+            recipesids = query.all() #Returns the recipe ID's as tuples
+            recipesids = [recipeid[0] for recipeid in recipesids] #Takes the first element of each tuple and puts it in a list
+            recipes = Recipe.query.filter(Recipe.recipeID.in_(recipesids)).all() # Queries the database and gets all the recipes using the recipes ID's
+
+            option = 1
+            if len(recipes) > 0:
+                return render_template("recommended_recipes.html", recipes=recipes, option=option)
+            else:
+                return "No recipes found."
+        else:
+            return "No ingredients provided."
+
     return app

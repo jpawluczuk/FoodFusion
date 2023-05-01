@@ -13,18 +13,19 @@ FoodFusion is a object betection based web application that provides users with 
 1. Run xampp and start the Apache and MySQL modules
 2. Import the database from the static/database folder, the file is called foodfusion.sql.
 3. Open the project in your IDE (For the project I used VS Code)
-4. Open the terminal
-5. Run the following command to create a virtual environment
+4.  If you are using root as your user for mysql, no changes need to be made. If you have changed the user and password for mysql, open the ```app.py``` file. On line 13 you will see ```app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://username:password@localhost/foodfusiondb"```. You will need to change that to ``` app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://username:password@localhost/foodfusiondb" ``` changing the "username" and "password" to your match your configuration.
+5. Open the terminal
+6. Run the following command to create a virtual environment
 ``` python -m venv venv``` This will create a folder called venv in the projects directory
-6.  To active the virtual environment you can do one of the following:
+8.  To active the virtual environment you can do one of the following:
     - Change the Python interpreter in the IDE to the one in the venv folder
     - Run this command to activate the virtual environment
     ``` venv\Scripts\Activate.ps1```
-7. Run the follwing command to install the required packages (this can take a while):
+9. Run the follwing command to install the required packages (this can take a while):
 ``` pip install -r requirements.txt```
-8. Once the packages have been installed you can run the application by running the following command:
+10. Once the packages have been installed you can run the application by running the following command:
 ``` flask --app app run```
-9. To view the application after it is running, open a browser and go to the following url:
+11. To view the application after it is running, open a browser and go to the following url:
 ``` http://localhost:5000/```
 
 ## Testing

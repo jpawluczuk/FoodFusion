@@ -27,6 +27,9 @@ FoodFusion is a object betection based web application that provides users with 
 9. To view the application after it is running, open a browser and go to the following url:
 ``` http://localhost:5000/```
 
+## Testing
+``` static/images/test_images ``` directory has images for testing purposes. Any other image can also be used.
+
 ## Usage
 The project as of right now has one function and that is to provide a recipe to the user based on the ingredients that they have. 
 

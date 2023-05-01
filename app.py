@@ -76,7 +76,7 @@ def create_app(test_config=None):
 
             results.render()
             now_time = datetime.datetime.now().strftime(DATETIME_FORMAT)
-            img_savedirectory = f"static/{now_time}.png"
+            img_savedirectory = f"static/detected_images/{now_time}.png"
             Image.fromarray(results.ims[0]).save(img_savedirectory)
             session['ingredients'] = ingredients_dict
 

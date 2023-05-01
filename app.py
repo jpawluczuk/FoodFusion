@@ -14,7 +14,9 @@ def create_app(test_config=None):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.secret_key = "dev"
     db.init_app(app)
-    model = torch.hub.load('ultralytics/yolov5', 'custom', path="D:\Forth_Year_College_Work\FYP\FoodFusion/static/best.pt")  # force_reload = recache latest code
+
+    path_to_model = os.path.join(os.path.dirname(__file__), 'static', 'best.pt')
+    model = torch.hub.load('ultralytics/yolov5', 'custom', path=path_to_model)  # force_reload = recache latest code
 
     DATETIME_FORMAT = "%Y-%m-%d_%H-%M-%S-%f"
 

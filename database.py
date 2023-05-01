@@ -27,7 +27,7 @@ class Instruction(db.Model):
     instructionID = db.Column(db.Integer, primary_key=True)
     step_number = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String(200), nullable=False)
-    Recipe_recipeID = db.Column(db.Integer, db.ForeignKey("recipe.recipeID"), nullable=False)
+    Recipes_recipeID = db.Column(db.Integer, db.ForeignKey("recipe.recipeID"), nullable=False)
 
 class Recipe(db.Model):
     __tablename__ = "recipe"
@@ -42,7 +42,7 @@ class RecipeIngredient(db.Model):
     __tablename__ = "recipes_has_ingredients"
     Recipes_recipeID = db.Column(db.Integer, db.ForeignKey("recipe.recipeID"), primary_key=True, nullable=False)
     Ingredients_ingredientID = db.Column(db.Integer, db.ForeignKey("ingredient.ingredientID"), primary_key=True, nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
+    quantity = db.Column(db.String(10), nullable=False)
     Units_unitID = db.Column(db.Integer, db.ForeignKey("units.unitID"), nullable=False)
 
 class Units(db.Model):

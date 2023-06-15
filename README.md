@@ -1,7 +1,7 @@
 # FoodFusion
 
 ## Project Description
-FoodFusion is a object betection based web application that provides users with recipes based on the ingredients that they have. The user uploads an image of their ingredients and the applicaiton provides them with delicious recipes.
+FoodFusion is a object detection based web application that provides users with recipes based on the ingredients that they have. The user uploads an image of their ingredients and the applicaiton provides them with delicious recipes.
 
 ## Requirements
 - Python 3.9 or above
